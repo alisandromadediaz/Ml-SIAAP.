@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SIAAP — Sistema Inteligente de Apoyo al Aprendizaje Personalizado. Predicción de rendimiento académico con Machine Learning e Inteligencia Artificial.">
+    <meta name="keywords" content="SIAAP, Machine Learning, Educación, Rendimiento Académico, CRISP-ML, Inteligencia Artificial, Realidad Aumentada">
+    <meta name="author" content="Alisandro Made">
+    <title>SIAAP — Sistema Inteligente de Apoyo al Aprendizaje Personalizado</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════════════ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2128;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --accent-green: #39d353;
+            --accent-gold: #d29922;
+            --accent-red: #f85149;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --gradient-main: linear-gradient(135deg, #1f6feb 0%, #6e40c9 50%, #0075ca 100%);
+            --gradient-hero: linear-gradient(135deg, #0d1117 0%, #0f2d5e 50%, #1a0a2e 100%);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           NAVBAR
+        ═══════════════════════════════════════════════════ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(13, 17, 23, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(13, 17, 23, 0.98);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-main);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+
+        .nav-brand-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-blue);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-blue);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--gradient-main);
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: opacity 0.2s, transform 0.2s !important;
+        }
+
+        .nav-cta:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           HERO SECTION
+        ═══════════════════════════════════════════════════ */
+        #hero {
+            min-height: 100vh;
+            background: var(--gradient-hero);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 100px 2rem 4rem;
+        }
+
+        /* Partículas animadas de fondo */
+        .particles {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float-particle 8s infinite ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes float-particle {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            33% { transform: translateY(-40px) rotate(120deg); opacity: 0.6; }
+            66% { transform: translateY(20px) rotate(240deg); opacity: 0.2; }
+        }
+
+        /* Grid de líneas */
+        .grid-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 50px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            animation: fade-in-up 0.8s ease;
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            animation: fade-in-up 0.8s ease 0.1s both;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: gradient-shift 4s infinite linear;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            animation: fade-in-up 0.8s ease 0.2s both;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            animation: fade-in-up 0.8s ease 0.3s both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gradient-main);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(31, 111, 235, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+
+        /* Hero AR Image */
+        .hero-visual {
+            position: relative;
+            animation: fade-in-right 1s ease 0.4s both;
+        }
+
+        .hero-image-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 60px rgba(88, 166, 255, 0.2);
+            animation: float-image 6s ease-in-out infinite;
+        }
+
+        @keyframes float-image {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(188, 140, 255, 0.1));
+            pointer-events: none;
+        }
+
+        /* Floating stats cards */
+        .floating-card {
+            position: absolute;
+            background: rgba(22, 27, 34, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            animation: float-card 4s ease-in-out infinite;
+        }
+
+        .floating-card.card-1 {
+            top: 10%;
+            right: -20px;
+            animation-delay: 0s;
+        }
+
+        .floating-card.card-2 {
+            bottom: 20%;
+            left: -20px;
+            animation-delay: 2s;
+        }
+
+        @keyframes float-card {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .floating-card .card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .floating-card .card-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        /* Hero Stats */
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            animation: fade-in-up 0.8s ease 0.4s both;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           SECTION STYLES
+        ═══════════════════════════════════════════════════ */
+        section {
+            padding: 6rem 2rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: var(--accent-blue);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ABOUT / PROBLEMA SECTION
+        ═══════════════════════════════════════════════════ */
+        #problema {
+            background: var(--bg-secondary);
+        }
+
+        .problema-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .problema-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .problema-text h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .problema-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .problema-highlight {
+            background: rgba(248, 81, 73, 0.1);
+            border-left: 4px solid var(--accent-red);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #ffb3b0;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FEATURES / CRISP-ML SECTION
+        ═══════════════════════════════════════════════════ */
+        #metodologia {
+            background: var(--bg-primary);
+        }
+
+        .crisp-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .crisp-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+        }
+
+        .crisp-item {
+            position: relative;
+            padding: 1.5rem 1.5rem 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .crisp-item:hover {
+            transform: translateX(8px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.15);
+        }
+
+        .crisp-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        .crisp-phase {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-number {
+            background: var(--gradient-main);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .phase-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .phase-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding-left: 3rem;
+        }
+
+        .crisp-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .crisp-visual img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .metodologia-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           MODELOS / FEATURES CARDS
+        ═══════════════════════════════════════════════════ */
+        #modelos {
+            background: var(--bg-secondary);
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent, var(--accent-blue));
+        }
+
+        .model-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--card-accent, var(--accent-blue));
+        }
+
+        .model-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .model-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .model-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .model-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .metric-name {
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--accent-green);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .metric-bar-container {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 2px;
+        }
+
+        .metric-bar {
+            height: 100%;
+            border-radius: 2px;
+            background: var(--accent-green);
+            transition: width 1s ease;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           AR GALLERY SECTION
+        ═══════════════════════════════════════════════════ */
+        #ra-gallery {
+            background: var(--bg-primary);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            group: true;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
+            display: flex;
+            align-items: flex-end;
+            padding: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-caption {
+            color: white;
+        }
+
+        .gallery-caption h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .gallery-caption p {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .gallery-border {
+            position: absolute;
+            inset: 0;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-border {
+            border-color: var(--accent-blue);
+        }
+
+        .gallery-tag {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(88, 166, 255, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           VARIABLES SECTION
+        ═══════════════════════════════════════════════════ */
+        #variables {
+            background: var(--bg-secondary);
+        }
+
+        .variables-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .variables-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .variables-table th {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .variables-table td {
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .variables-table tr:hover td {
+            background: rgba(88, 166, 255, 0.05);
+        }
+
+        .var-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .var-type.num { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); }
+        .var-type.bin { background: rgba(57, 211, 83, 0.15); color: var(--accent-green); }
+        .var-type.ord { background: rgba(210, 153, 34, 0.15); color: var(--accent-gold); }
+        .var-type.obj { background: rgba(188, 140, 255, 0.15); color: var(--accent-purple); }
+
+        .importance-bar-container {
+            width: 120px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .importance-bar {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESULTADOS SECTION
+        ═══════════════════════════════════════════════════ */
+        #resultados {
+            background: var(--bg-primary);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(88, 166, 255, 0.15);
+        }
+
+        .result-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(88, 166, 255, 0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        .result-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .result-icon {
+            font-size: 2rem;
+        }
+
+        /* Intervenciones */
+        .interventions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .intervention-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .intervention-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .intervention-card.bajo {
+            border-color: rgba(248, 81, 73, 0.3);
+        }
+        .intervention-card.bajo:hover {
+            border-color: var(--accent-red);
+            box-shadow: 0 12px 32px rgba(248, 81, 73, 0.15);
+        }
+
+        .intervention-card.medio {
+            border-color: rgba(210, 153, 34, 0.3);
+        }
+        .intervention-card.medio:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 12px 32px rgba(210, 153, 34, 0.15);
+        }
+
+        .intervention-card.alto {
+            border-color: rgba(57, 211, 83, 0.3);
+        }
+        .intervention-card.alto:hover {
+            border-color: var(--accent-green);
+            box-shadow: 0 12px 32px rgba(57, 211, 83, 0.15);
+        }
+
+        .intervention-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .bajo .intervention-badge { background: rgba(248,81,73,0.2); color: var(--accent-red); }
+        .medio .intervention-badge { background: rgba(210,153,34,0.2); color: var(--accent-gold); }
+        .alto .intervention-badge { background: rgba(57,211,83,0.2); color: var(--accent-green); }
+
+        .intervention-card h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .intervention-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           TECH STACK SECTION
+        ═══════════════════════════════════════════════════ */
+        #tecnologias {
+            background: var(--bg-secondary);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+
+        .tech-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-blue);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .tech-desc {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           CTA SECTION
+        ═══════════════════════════════════════════════════ */
+        #cta {
+            background: var(--bg-primary);
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(31, 111, 235, 0.15) 0%, rgba(110, 64, 201, 0.15) 100%);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            border-radius: 24px;
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+
+        .cta-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-box p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           FOOTER
+        ═══════════════════════════════════════════════════ */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-brand p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .footer-section h4 {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--accent-blue);
+        }
+
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 2rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* ═══════════════════════════════════════════════════
+           ANIMATIONS
+        ═══════════════════════════════════════════════════ */
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fade-in-right {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s ease;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .hero-content { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .problema-grid, .metodologia-grid { grid-template-columns: 1fr; }
+            .models-grid { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .interventions-grid { grid-template-columns: 1fr; }
+            .tech-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════ NAVBAR ═══════════════ -->
+    <nav class="navbar" id="navbar">
+        <a href="#hero" class="nav-brand">
+            <div class="nav-logo">🎓</div>
+            <span class="nav-brand-text">SIAAP</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#problema">El Problema</a></li>
+            <li><a href="#metodologia">CRISP-ML(Q)</a></li>
+            <li><a href="#modelos">Modelos</a></li>
+            <li><a href="#ra-gallery">RA Gallery</a></li>
+            <li><a href="#resultados">Resultados</a></li>
+            <li><a href="https://github.com/TU_USUARIO/SIAAP" target="_blank" class="nav-cta">🚀 Ver en GitHub</a></li>
+        </ul>
+    </nav>
+
+    <!-- ═══════════════ HERO ═══════════════ -->
+    <section id="hero">
+        <div class="grid-bg"></div>
+
+        <!-- Partículas decorativas -->
+        <div class="particles" aria-hidden="true">
+            <div class="particle" style="width:6px;height:6px;background:#58a6ff;top:15%;left:10%;animation-delay:0s;animation-duration:9s;"></div>
+            <div class="particle" style="width:4px;height:4px;background:#bc8cff;top:30%;left:20%;animation-delay:2s;animation-duration:7s;"></div>
+            <div class="particle" style="width:8px;height:8px;background:#39d353;top:60%;left:5%;animation-delay:4s;animation-duration:11s;"></div>
+            <div class="particle" style="width:5px;height:5px;background:#58a6ff;top:80%;left:15%;animation-delay:1s;animation-duration:8s;"></div>
+            <div class="particle" style="width:3px;height:3px;background:#d29922;top:20%;right:10%;animation-delay:3s;animation-duration:10s;"></div>
+            <div class="particle" style="width:7px;height:7px;background:#bc8cff;top:70%;right:8%;animation-delay:0.5s;animation-duration:9s;"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">
+                    🤖 IA Educativa · CRISP-ML(Q) · Machine Learning
+                </div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">SIAAP</span><br>
+                    Sistema Inteligente<br>de Aprendizaje<br>Personalizado
+                </h1>
+                <p class="hero-description">
+                    Predice el <strong>rendimiento académico</strong> de cada estudiante y recomienda
+                    <strong>intervenciones pedagógicas personalizadas</strong> con Machine Learning supervisado,
+                    antes de que el riesgo de abandono sea irreversible.
+                </p>
+                <div class="hero-actions">
+                    <a href="#modelos" class="btn-primary" id="hero-ver-modelos">
+                        🔬 Explorar Modelos
+                    </a>
+                    <a href="https://github.com/TU_USUARIO/SIAAP" target="_blank" class="btn-secondary" id="hero-github">
+                        📂 Ver en GitHub
+                    </a>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">1200</div>
+                        <div class="stat-label">Estudiantes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">71.1%</div>
+                        <div class="stat-label">AUC-ROC</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Modelos ML</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">6</div>
+                        <div class="stat-label">Fases CRISP</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-image-container">
+                    <img src="assets/siaap_ar_hero.png" alt="SIAAP Sistema de RA con dashboard holográfico de rendimiento académico">
+                    <div class="hero-image-overlay"></div>
+                </div>
+
+                <!-- Floating stats -->
+                <div class="floating-card card-1">
+                    <div class="card-value">🟢 Alto</div>
+                    <div class="card-label">Rendimiento predicho</div>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="card-value">71.1%</div>
+                    <div class="card-label">AUC-ROC</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ EL PROBLEMA ═══════════════ -->
+    <section id="problema">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">🚨 El Problema</div>
+                <h2 class="section-title">Las señales de riesgo llegan demasiado tarde</h2>
+                <p class="section-subtitle">
+                    Un porcentaje importante de estudiantes abandona o reprueba cursos porque
+                    las alertas de riesgo se detectan cuando ya no hay margen de intervención.
+                </p>
+            </div>
+
+            <div class="problema-grid">
+                <div class="problema-image animate-on-scroll">
+                    <img src="assets/siaap_ar_classroom.png" alt="Aula inteligente con Realidad Aumentada y análisis de datos de estudiantes">
+                </div>
+                <div class="problema-text animate-on-scroll">
+                    <h3>¿Por qué falla la detección temprana?</h3>
+                    <p>
+                        Los sistemas educativos tradicionales evalúan a los estudiantes al final del período,
+                        cuando ya es demasiado tarde para intervenir. Las señales de riesgo —baja asistencia,
+                        entregas tardías, poco compromiso— permanecen invisibles durante semanas.
+                    </p>
+
+                    <div class="problema-highlight">
+                        🔴 El costo del problema: deserción escolar, reprobación masiva, recursos docentes
+                        mal distribuidos y estudiantes que podrían haberse salvado con una intervención a tiempo.
+                    </div>
+
+                    <p>
+                        <strong>SIAAP</strong> resuelve esto aplicando Machine Learning supervisado sobre datos
+                        de comportamiento de las <strong>primeras semanas del curso</strong>, permitiendo actuar
+                        antes de que el problema sea irreversible.
+                    </p>
+
+                    <div style="margin-top: 1.5rem;">
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div style="background: rgba(57,211,83,0.1); border: 1px solid rgba(57,211,83,0.3); border-radius: 8px; padding: 12px 20px;">
+                                <div style="color: #39d353; font-weight: 700; font-size: 1.2rem;">✅ Detección temprana</div>
+                                <div style="color: #8b949e; font-size: 0.8rem;">Semanas → Días</div>
+                            </div>
+                            <div style="background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3); border-radius: 8px; padding: 12px 20px;">
+                                <div style="color: #58a6ff; font-weight: 700; font-size: 1.2rem;">🎯 Intervención personalizada</div>
+                                <div style="color: #8b949e; font-size: 0.8rem;">Recomendaciones accionables</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ METODOLOGÍA CRISP-ML ═══════════════ -->
+    <section id="metodologia">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">🔬 Metodología</div>
+                <h2 class="section-title">CRISP-ML(Q) — 6 Fases Completas</h2>
+                <p class="section-subtitle">
+                    Cross Industry Standard Process for Machine Learning with Quality Assurance —
+                    el estándar de la industria para proyectos ML en producción.
+                </p>
+            </div>
+
+            <div class="metodologia-grid">
+                <div class="crisp-visual animate-on-scroll">
+                    <img src="assets/siaap_ar_analytics.png" alt="Dashboard de analytics con RA mostrando métricas CRISP-ML del sistema">
+                </div>
+
+                <div class="crisp-timeline animate-on-scroll">
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">1</div>
+                            <div class="phase-title">Business & Data Understanding</div>
+                        </div>
+                        <div class="phase-desc">
+                            Definir el problema educativo: predecir rendimiento (Bajo/Medio/Alto)
+                            en 3 categorías. Análisis exploratorio de 1.200 estudiantes con 10 variables
+                            de comportamiento y contexto.
+                        </div>
+                    </div>
+
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">2</div>
+                            <div class="phase-title">Data Preparation</div>
+                        </div>
+                        <div class="phase-desc">
+                            Imputación con medianas (3 columnas, ~3% faltantes), ingeniería de
+                            variables (índice de compromiso, riesgo por descanso), escalado con
+                            StandardScaler y partición 80/20 estratificada.
+                        </div>
+                    </div>
+
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">3</div>
+                            <div class="phase-title">Modeling</div>
+                        </div>
+                        <div class="phase-desc">
+                            Entrenamiento de Regresión Logística, Árbol de Decisión y Random Forest.
+                            Validación cruzada estratificada 5-folds. Optimización de hiperparámetros
+                            con GridSearchCV sobre Random Forest.
+                        </div>
+                    </div>
+
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">4</div>
+                            <div class="phase-title">Evaluation</div>
+                        </div>
+                        <div class="phase-desc">
+                            Evaluación única sobre holdout: Accuracy 0.533, F1-Macro 0.538,
+                            AUC-ROC 0.711. Análisis de importancia de variables e interpretabilidad.
+                        </div>
+                    </div>
+
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">5</div>
+                            <div class="phase-title">Deployment</div>
+                        </div>
+                        <div class="phase-desc">
+                            Empaquetado del modelo (joblib), función de recomendación pedagógica,
+                            interfaz Streamlit desplegable. Diseñado para exponer como REST API (FastAPI).
+                        </div>
+                    </div>
+
+                    <div class="crisp-item">
+                        <div class="crisp-phase">
+                            <div class="phase-number">6</div>
+                            <div class="phase-title">Monitoring & Maintenance</div>
+                        </div>
+                        <div class="phase-desc">
+                            Sistema de alerta automática (F1 &lt; 0.75), detección de drift con
+                            KS-test, re-entrenamiento semestral, supervisión humana docente y
+                            auditoría ética de sesgos.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ MODELOS ML ═══════════════ -->
+    <section id="modelos">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">🤖 Modelos</div>
+                <h2 class="section-title">Tres Algoritmos de Aprendizaje Supervisado</h2>
+                <p class="section-subtitle">
+                    Comparación rigurosa entre modelos para seleccionar el mejor candidato
+                    para predicción de rendimiento académico multiclase.
+                </p>
+            </div>
+
+            <div class="models-grid animate-on-scroll">
+                <!-- Regresión Logística -->
+                <div class="model-card" style="--card-accent: #58a6ff;">
+                    <div class="model-icon">📊</div>
+                    <h3>Regresión Logística</h3>
+                    <p>
+                        Modelo base interpretable. Asume relación lineal entre variables escaladas y
+                        el log-odds de cada clase. Solver LBFGS con regularización L2.
+                        Clasificación multinomial.
+                    </p>
+                    <div class="model-metrics">
+                        <div class="metric-row">
+                            <span class="metric-name">F1-Macro (CV)</span>
+                            <span class="metric-value">0.568</span>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar" style="width: 56.8%;"></div>
+                        </div>
+                        <div class="metric-row" style="margin-top:0.5rem;">
+                            <span class="metric-name">AUC-ROC Test</span>
+                            <span class="metric-value">~0.710</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Requiere escalado</span>
+                            <span class="metric-value" style="color: #d29922;">✓ Sí</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Random Forest -->
+                <div class="model-card" style="--card-accent: #39d353; border-color: rgba(57,211,83,0.4);">
+                    <div style="position:absolute;top:1rem;right:1rem;background:rgba(57,211,83,0.2);color:#39d353;padding:4px 12px;border-radius:50px;font-size:0.75rem;font-weight:700;">⭐ SELECCIONADO</div>
+                    <div class="model-icon">🌲</div>
+                    <h3>Random Forest</h3>
+                    <p>
+                        Modelo ensemble con 400 árboles de decisión. Hiperparámetros optimizados con
+                        GridSearchCV. No requiere escalado. Robusto a valores atípicos y no-linealidades.
+                    </p>
+                    <div class="model-metrics">
+                        <div class="metric-row">
+                            <span class="metric-name">F1-Macro (CV)</span>
+                            <span class="metric-value">0.545</span>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar" style="width: 54.5%; background: linear-gradient(90deg, #39d353, #58a6ff);"></div>
+                        </div>
+                        <div class="metric-row" style="margin-top:0.5rem;">
+                            <span class="metric-name">AUC-ROC Test</span>
+                            <span class="metric-value">0.711</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Requiere escalado</span>
+                            <span class="metric-value" style="color: #39d353;">✗ No</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Regresión Lineal -->
+                <div class="model-card" style="--card-accent: #bc8cff;">
+                    <div class="model-icon">📈</div>
+                    <h3>Regresión Lineal</h3>
+                    <p>
+                        Predice el índice de rendimiento continuo subyacente (0-1). Permite
+                        ranking y tendencias. Complementario al modelo de clasificación para
+                        análisis de progresión académica.
+                    </p>
+                    <div class="model-metrics">
+                        <div class="metric-row">
+                            <span class="metric-name">R² Score</span>
+                            <span class="metric-value">~0.47</span>
+                        </div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar" style="width: 47%; background: linear-gradient(90deg, #bc8cff, #58a6ff);"></div>
+                        </div>
+                        <div class="metric-row" style="margin-top:0.5rem;">
+                            <span class="metric-name">Target</span>
+                            <span class="metric-value">Continuo (0-1)</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-name">Uso</span>
+                            <span class="metric-value">Ranking</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ AR GALLERY ═══════════════ -->
+    <section id="ra-gallery">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">🥽 Realidad Aumentada</div>
+                <h2 class="section-title">Visualizaciones RA Generadas por IA</h2>
+                <p class="section-subtitle">
+                    Imágenes conceptuales del futuro del aprendizaje personalizado con
+                    Realidad Aumentada e Inteligencia Artificial. Generadas con IA.
+                </p>
+            </div>
+
+            <div class="gallery-grid animate-on-scroll">
+                <div class="gallery-item">
+                    <img src="assets/siaap_ar_hero.png" alt="Dashboard holográfico de RA para análisis de rendimiento académico">
+                    <div class="gallery-overlay">
+                        <div class="gallery-caption">
+                            <h4>Dashboard RA de Rendimiento</h4>
+                            <p>Métricas académicas holográficas en tiempo real</p>
+                        </div>
+                    </div>
+                    <div class="gallery-border"></div>
+                    <div class="gallery-tag">🥽 RA + IA</div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="assets/siaap_ar_ml_brain.png" alt="Cerebro holográfico con redes neuronales y predicciones de machine learning">
+                    <div class="gallery-overlay">
+                        <div class="gallery-caption">
+                            <h4>Neural ML Holográfico</h4>
+                            <p>Redes neuronales y clasificación 3D en RA</p>
+                        </div>
+                    </div>
+                    <div class="gallery-border"></div>
+                    <div class="gallery-tag">🧠 Deep Learning</div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="assets/siaap_ar_classroom.png" alt="Aula inteligente del futuro con RA y aprendizaje personalizado">
+                    <div class="gallery-overlay">
+                        <div class="gallery-caption">
+                            <h4>Aula Inteligente del Futuro</h4>
+                            <p>Rutas de aprendizaje personalizadas en RA</p>
+                        </div>
+                    </div>
+                    <div class="gallery-border"></div>
+                    <div class="gallery-tag">🏫 EdTech</div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="assets/siaap_ar_analytics.png" alt="Analytics dashboard de RA con visualización de datos de predicción académica">
+                    <div class="gallery-overlay">
+                        <div class="gallery-caption">
+                            <h4>Analytics Dashboard RA</h4>
+                            <p>Métricas ML y detección de riesgo visualizadas en 3D</p>
+                        </div>
+                    </div>
+                    <div class="gallery-border"></div>
+                    <div class="gallery-tag">📊 Analytics</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ VARIABLES ═══════════════ -->
+    <section id="variables">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">📋 Dataset</div>
+                <h2 class="section-title">Variables del Sistema</h2>
+                <p class="section-subtitle">
+                    10 variables predictoras extraídas de un LMS y encuestas socioeducativas,
+                    más 2 variables derivadas con ingeniería de características.
+                </p>
+            </div>
+
+            <div class="variables-table-wrapper animate-on-scroll">
+                <table class="variables-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Importancia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>horas_estudio_semana</strong></td>
+                            <td><span class="var-type num">Numérica</span></td>
+                            <td>Horas de estudio autónomo semanal (0-25)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:100%"></div></div> 21.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>nota_previa</strong></td>
+                            <td><span class="var-type num">Numérica</span></td>
+                            <td>Promedio académico del periodo anterior (0-10)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:56%"></div></div> 11.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>indice_compromiso</strong> ⚡</td>
+                            <td><span class="var-type num">Derivada</span></td>
+                            <td>Ponderación de asistencia, entregas y uso de plataforma</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:52%"></div></div> 11.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>indice_socioeconomico</strong></td>
+                            <td><span class="var-type num">Numérica</span></td>
+                            <td>Índice socioeconómico estandarizado (z-score)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:51%"></div></div> 10.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>asistencia_pct</strong></td>
+                            <td><span class="var-type num">Numérica %</span></td>
+                            <td>Porcentaje de asistencia a clases (30-100%)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:49%"></div></div> 10.4%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>entregas_a_tiempo_pct</strong></td>
+                            <td><span class="var-type num">Numérica %</span></td>
+                            <td>Porcentaje de tareas entregadas a tiempo</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:40%"></div></div> 8.5%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>horas_plataforma_semana</strong></td>
+                            <td><span class="var-type num">Numérica</span></td>
+                            <td>Horas de uso semanal del LMS (Moodle/Canvas)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:38%"></div></div> 8.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>participacion_foro</strong></td>
+                            <td><span class="var-type num">Entera</span></td>
+                            <td>Intervenciones en foros de discusión (0-14)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:33%"></div></div> 7.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>horas_sueno</strong></td>
+                            <td><span class="var-type num">Numérica</span></td>
+                            <td>Promedio de horas de sueño diario (3-10)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:28%"></div></div> 5.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>apoyo_familiar</strong></td>
+                            <td><span class="var-type ord">Ordinal</span></td>
+                            <td>Percepción de apoyo familiar (escala 1-5)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:22%"></div></div> 4.7%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>acceso_internet_estable</strong></td>
+                            <td><span class="var-type bin">Binaria</span></td>
+                            <td>1 = conexión estable, 0 = intermitente/nula</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:18%"></div></div> 3.8%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>riesgo_descanso</strong> ⚡</td>
+                            <td><span class="var-type bin">Derivada</span></td>
+                            <td>1 si duerme menos de 6 horas (señal de alerta)</td>
+                            <td><div class="importance-bar-container"><div class="importance-bar" style="width:15%"></div></div> 3.2%</td>
+                        </tr>
+                        <tr style="background: rgba(188,140,255,0.05);">
+                            <td><strong>rendimiento</strong></td>
+                            <td><span class="var-type obj">Objetivo</span></td>
+                            <td>Clase target: <strong>Bajo</strong> / <strong>Medio</strong> / <strong>Alto</strong></td>
+                            <td>Variable objetivo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem;">
+                ⚡ Variables derivadas mediante ingeniería de características con sentido pedagógico directo.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════ RESULTADOS ═══════════════ -->
+    <section id="resultados">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">📈 Resultados</div>
+                <h2 class="section-title">Evaluación del Modelo Final</h2>
+                <p class="section-subtitle">
+                    Métricas evaluadas sobre el conjunto de prueba holdout (240 estudiantes),
+                    que no participó en el entrenamiento ni la selección de hiperparámetros.
+                </p>
+            </div>
+
+            <div class="results-grid animate-on-scroll">
+                <div class="result-card">
+                    <div class="result-icon">🎯</div>
+                    <div class="result-value">0.533</div>
+                    <div class="result-label">Accuracy (Test)</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                        53.3% de predicciones correctas sobre 240 estudiantes
+                    </p>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">📊</div>
+                    <div class="result-value">0.538</div>
+                    <div class="result-label">F1-Score Macro</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                        Muy por encima del azar (F1 ≈ 0.33 con 3 clases)
+                    </p>
+                </div>
+                <div class="result-card">
+                    <div class="result-icon">📈</div>
+                    <div class="result-value">0.711</div>
+                    <div class="result-label">AUC-ROC Macro</div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem;">
+                        Buena capacidad de discriminación entre las 3 clases
+                    </p>
+                </div>
+            </div>
+
+            <!-- Intervenciones pedagógicas -->
+            <div class="section-header animate-on-scroll" style="margin-top: 4rem;">
+                <div class="section-tag">🎓 Intervenciones</div>
+                <h2 class="section-title">Recomendaciones Pedagógicas</h2>
+                <p class="section-subtitle">
+                    El sistema no solo predice, convierte la predicción en una acción concreta para el docente.
+                </p>
+            </div>
+
+            <div class="interventions-grid animate-on-scroll">
+                <div class="intervention-card bajo">
+                    <div class="intervention-badge">🔴 Bajo Rendimiento</div>
+                    <h4>Intervención Urgente</h4>
+                    <p>
+                        Activar tutorías personalizadas de refuerzo semanal. Contactar al docente tutor
+                        para evaluación inmediata. Revisar carga académica y acceso a recursos.
+                    </p>
+                </div>
+                <div class="intervention-card medio">
+                    <div class="intervention-badge">🟡 Rendimiento Medio</div>
+                    <h4>Ruta Adaptativa</h4>
+                    <p>
+                        Asignar ruta de aprendizaje adaptativa personalizada. Monitoreo quincenal
+                        de progreso. Identificar y reforzar áreas de mejora específicas.
+                    </p>
+                </div>
+                <div class="intervention-card alto">
+                    <div class="intervention-badge">🟢 Alto Rendimiento</div>
+                    <h4>Enriquecimiento</h4>
+                    <p>
+                        Ofrecer contenido de profundización avanzado. Asignar rol de mentoría entre pares.
+                        Proponer proyectos de investigación y retos adicionales.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ TECNOLOGÍAS ═══════════════ -->
+    <section id="tecnologias">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <div class="section-tag">⚙️ Stack Tecnológico</div>
+                <h2 class="section-title">Tecnologías Utilizadas</h2>
+            </div>
+
+            <div class="tech-grid animate-on-scroll">
+                <div class="tech-card">
+                    <div class="tech-icon">🐍</div>
+                    <div class="tech-name">Python 3.8+</div>
+                    <div class="tech-desc">Lenguaje principal del proyecto</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <div class="tech-name">scikit-learn</div>
+                    <div class="tech-desc">Modelos ML y métricas de evaluación</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📊</div>
+                    <div class="tech-name">Pandas & NumPy</div>
+                    <div class="tech-desc">Procesamiento y análisis de datos</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🖥️</div>
+                    <div class="tech-name">Streamlit</div>
+                    <div class="tech-desc">Interfaz web interactiva del modelo</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📈</div>
+                    <div class="tech-name">Plotly</div>
+                    <div class="tech-desc">Visualizaciones interactivas avanzadas</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🎨</div>
+                    <div class="tech-name">Matplotlib & Seaborn</div>
+                    <div class="tech-desc">Visualizaciones estáticas del EDA</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📦</div>
+                    <div class="tech-name">Joblib</div>
+                    <div class="tech-desc">Persistencia y serialización del modelo</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🐙</div>
+                    <div class="tech-name">GitHub</div>
+                    <div class="tech-desc">Control de versiones y despliegue</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ CTA ═══════════════ -->
+    <section id="cta">
+        <div class="container">
+            <div class="cta-box animate-on-scroll">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                <h2>¿Listo para explorar SIAAP?</h2>
+                <p>
+                    Accede al código completo, el cuaderno Jupyter con todo el pipeline CRISP-ML(Q)
+                    y la aplicación Streamlit interactiva desde GitHub.
+                </p>
+                <div class="cta-actions">
+                    <a href="https://github.com/TU_USUARIO/SIAAP" target="_blank" class="btn-primary" id="cta-github-link">
+                        🐙 Ver en GitHub
+                    </a>
+                    <a href="app_streamlit.py" class="btn-secondary" id="cta-streamlit-link">
+                        🖥️ Abrir Streamlit App
+                    </a>
+                    <a href="SIAAP_CRISP_ML.ipynb" class="btn-secondary" id="cta-notebook-link">
+                        📓 Ver Notebook
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════ FOOTER ═══════════════ -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>🎓 SIAAP</h3>
+                <p>
+                    Sistema Inteligente de Apoyo al Aprendizaje Personalizado.<br>
+                    Predicción de rendimiento académico con Machine Learning supervisado.<br>
+                    Metodología CRISP-ML(Q). Año 2026.
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Proyecto</h4>
+                <ul>
+                    <li><a href="#metodologia">Metodología</a></li>
+                    <li><a href="#modelos">Modelos ML</a></li>
+                    <li><a href="#resultados">Resultados</a></li>
+                    <li><a href="#variables">Variables</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Recursos</h4>
+                <ul>
+                    <li><a href="SIAAP_CRISP_ML.ipynb">📓 Jupyter Notebook</a></li>
+                    <li><a href="app_streamlit.py">🖥️ Streamlit App</a></li>
+                    <li><a href="README.md">📋 README</a></li>
+                    <li><a href="requirements.txt">⚙️ Requerimientos</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Referencias</h4>
+                <ul>
+                    <li><a href="https://ml-ops.org/content/crisp-ml" target="_blank">CRISP-ML(Q)</a></li>
+                    <li><a href="https://scikit-learn.org" target="_blank">scikit-learn</a></li>
+                    <li><a href="https://streamlit.io" target="_blank">Streamlit</a></li>
+                    <li><a href="https://plotly.com" target="_blank">Plotly</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 SIAAP — Alisandro Made | Machine Learning aplicado a la Educación</span>
+            <span>Maestría en Inteligencia Artificial · Metodología CRISP-ML(Q)</span>
+        </div>
+    </footer>
+
+    <!-- ═══════════════ SCRIPTS ═══════════════ -->
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for animations
+        const animatedElements = document.querySelectorAll('.animate-on-scroll');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('animated');
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        animatedElements.forEach(el => observer.observe(el));
+
+        // Metric bars animation
+        const metricBars = document.querySelectorAll('.metric-bar');
+        const barObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bar = entry.target;
+                    const finalWidth = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = finalWidth;
+                    }, 100);
+                    barObserver.unobserve(bar);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        metricBars.forEach(bar => barObserver.observe(bar));
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 80;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Counter animation for hero stats
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    clearInterval(timer);
+                    start = target;
+                }
+                element.textContent = Number.isInteger(target) ?
+                    Math.floor(start).toLocaleString() :
+                    start.toFixed(1) + '%';
+            }, 16);
+        }
+    </script>
+</body>
+</html>

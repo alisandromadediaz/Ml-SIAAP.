@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.pyo
+*.pyd
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales generados por el notebook
+figura_*.png
+
+# Datos sensibles (nunca subir)
+*.csv
+*.xlsx
+datos_reales/
+
+# Modelos empaquetados grandes (opcional - los incluimos para demo)
+# modelo_produccion/*.pkl
